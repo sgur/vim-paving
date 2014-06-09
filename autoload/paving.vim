@@ -44,7 +44,7 @@ function! paving#cmd_generate(...)
   endfor
 
   if !has_key(config, 'vimrc')
-    let config.vimrc = get(config, 'vimrc', path . '/' . get(g:, 'rtp_default_filename', 'vimrc.loader'))
+    let config.vimrc = get(g:, 'paving#filename', get(config, 'vimrc', path . '/vimrc.paved'))
   endif
   if !has_key(config, 'bundle')
     let config.bundle = get(config, 'bundle', path . '/bundle')
@@ -245,13 +245,13 @@ function! s:on_source(bundle_dirs)
 endfunction
 " END
 
-let &cpo = s:save_cpo
-unlet s:save_cpo
 
 
 if expand("%:p") != expand("<sfile>:p")
+  let &cpo = s:save_cpo
+  unlet s:save_cpo
   finish
 endif
 
 
-call paving#store(g:env#rc_dir . '/vimrc.loader', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
+call paving#store(g:env#rc_dir . '/vimrc.paved', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
