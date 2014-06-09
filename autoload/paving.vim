@@ -221,7 +221,7 @@ function! s:default_vimdir()
 endfunction
 
 " BEGIN
-function! paving#loaded(plugin)
+function! PavingLoaded(plugin)
   return has_key(s:loaded, a:plugin)
 endfunction
 
@@ -248,3 +248,10 @@ endfunction
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
+
+if expand("%:p") != expand("<sfile>:p")
+  finish
+endif
+
+
+call paving#store(g:env#rc_dir . '/vimrc.loader', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
