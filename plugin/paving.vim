@@ -11,6 +11,10 @@ let g:loaded_paving = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+if !exists('g:paving#enabled')
+  let &runtimepath .= ',' . expand('<sfile>:~:h:h')
+endif
+
 command! -nargs=* PavingGenerate  call paving#cmd_generate(<f-args>)
 
 
