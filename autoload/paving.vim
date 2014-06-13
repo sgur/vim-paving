@@ -22,43 +22,69 @@ function! paving#store(filename, bundle_dir, ...)
     call extend(lines, s:deploy_functions())
   endif
   call writefile(lines, expand(a:filename))
+  return loaded
 endfunction
 
 
-
 function! paving#cmd_generate(...)
-  let config = {}
+  let config = copy(get(g:, 'paving#config', s:default_params()))
+  call extend(config , s:parse_params(a:000), 'force')
 
+  let loaded = has_key(config, 'ftbundle')
+        \ ? paving#store(config.vimrc, config.bundle, config.ftbundle)
+        \ : paving#store(config.vimrc, config.bundle)
+
+  call s:stats(config, loaded)
+endfunction
+
+
+let s:loaded = {}
+let s:bufname = expand('<sfile>')
+
+
+function! s:stats(config, loaded_plugins)
+  echohl Title | echo 'filename:'
+  echohl NONE | echo a:config.vimrc
+  echohl Title | echo 'bundle dir(s):'
+  echohl NONE | echo join(a:config.bundle, ', ')
+  if has_key(a:config, 'ftbundle')
+    echohl Title | echo 'ftbundle dir:'
+    echohl NONE | echo a:config.ftbundle
+  endif
+  echohl Title | echo 'loaded plugins:'
+  echohl NONE | echo join(sort(keys(a:loaded_plugins)), ', ')
+endfunction
+
+
+function! s:parse_params(args)
+  let config = {}
   let path = s:default_vimdir()
 
-  for opt in a:000
+  for opt in a:args
     if stridx(opt, '-bundle') == 0
       let opts = split(opt, '=')
-      let config.bundle = len(opts) > 1 ? split(opts[1],',') : path . '/bundle'
+      let config.bundle = len(opts) > 1 ? split(opts[1],',') : [path . '/bundle']
     elseif stridx(opt, '-ftbundle') == 0
       let opts = split(opt, '=')
       let config.ftbundle = len(opts) > 1 ? opts[1] : path . '/ftbundle'
     else
-      let config.vimrc = opt
+      if filereadable(opt)
+        let config.vimrc = opt
+      endif
     endif
   endfor
 
-  if !has_key(config, 'vimrc')
-    let config.vimrc = get(g:, 'paving#filename', get(config, 'vimrc', path . '/vimrc.paved'))
-  endif
-  if !has_key(config, 'bundle')
-    let config.bundle = get(config, 'bundle', path . '/bundle')
-  endif
-
-  if has_key(config, 'ftbundle')
-    call paving#store(config.vimrc, config.bundle, config.ftbundle)
-  else
-    call paving#store(config.vimrc, config.bundle)
-  endif
+  return config
 endfunction
-let s:loaded = {}
-let s:bufname = expand('<sfile>')
 
+
+function! s:default_params()
+  let path = s:default_vimdir()
+  return {
+        \   'vimrc' : path . '/vimrc.paved'
+        \ , 'bundle' : [path . '/bundle']
+        \ }
+endfunction
 
 
 function! s:prepare_blacklist()
