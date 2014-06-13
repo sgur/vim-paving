@@ -79,10 +79,9 @@ endfunction
 
 
 function! s:default_params()
-  let path = s:default_vimdir()
   return {
-        \   'vimrc' : path . '/vimrc.paved'
-        \ , 'bundle' : [path . '/bundle']
+        \   'vimrc' : '~/.vimrc.paved'
+        \ , 'bundle' : [s:default_vimdir() . '/bundle']
         \ }
 endfunction
 
@@ -247,6 +246,8 @@ function! s:default_vimdir()
 endfunction
 
 " BEGIN
+let g:paving#enabled = 1
+
 function! PavingLoaded(plugin)
   return has_key(s:loaded, a:plugin)
 endfunction
