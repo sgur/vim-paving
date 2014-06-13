@@ -14,12 +14,13 @@ function! paving#store(filename, bundle_dir, ...)
   let loaded = s:register(bundles)
   let [bundles, nobundles] = s:prune_bundles(bundles)
   call add(lines, 'set runtimepath =' . s:rtp_generate(bundles))
-  call extend(lines, s:source_functions(nobundles))
   call add(lines, 'let s:loaded = ' . string(loaded))
+  call extend(lines, s:source_functions(nobundles))
+  call extend(lines, s:deploy_loaded())
   " ftbundle directory
   if a:0 > 0
     call extend(lines, s:ft_generate(expand(a:1)))
-    call extend(lines, s:deploy_functions())
+    call extend(lines, s:deploy_on_source())
   endif
   call writefile(lines, expand(a:filename))
   return loaded
@@ -217,11 +218,22 @@ function! s:prune_bundles(dirnames)
 endfunction
 
 
-function! s:deploy_functions()
+function! s:get_function(id)
   let buf = readfile(s:bufname)
-  let start = index(buf, '" BEGIN')
-  let end = index(buf, '" END', start)
-  for l in range(start, end)
+  let start = index(buf, '" BEGIN_' . a:id)
+  let end = index(buf, '" END_' . a:id, start)
+  return buf[start+1 : end-1]
+endfunction
+
+
+function! s:deploy_loaded()
+  return s:get_function('LOADED')
+endfunction
+
+
+function! s:deploy_on_source()
+  let buf = s:get_function('ON_SOURCE')
+  for l in range(0, len(buf)-1)
     let buf[l] = substitute(buf[l]
           \ , 's:GLOBPATH(\([^)]\+\))'
           \ , !has('patch-7.4.279')
@@ -229,7 +241,7 @@ function! s:deploy_functions()
           \   : 'split(globpath(\1, 1))'
           \ ,'g')
   endfor
-  return buf[start+1 : end-1]
+  return buf
 endfunction
 
 
@@ -245,13 +257,15 @@ function! s:default_vimdir()
   endtry
 endfunction
 
-" BEGIN
+" BEGIN_LOADED
 let g:paving#enabled = 1
 
 function! PavingLoaded(plugin)
   return has_key(s:loaded, a:plugin)
 endfunction
+" END_LOADED
 
+" BEGIN_ON_SOURCE
 function! s:on_source(bundle_dirs)
   for dir in a:bundle_dirs
     let key = fnamemodify(dir, ':t')
@@ -270,7 +284,7 @@ function! s:on_source(bundle_dirs)
     endfor
   endfor
 endfunction
-" END
+" END_ON_SOURCE
 
 
 
