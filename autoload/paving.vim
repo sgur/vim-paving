@@ -160,19 +160,17 @@ function! s:ft_generate(ftbundle_dir)
   let _ = {}
   let lines = []
   for dir in s:glob(fnamemodify(a:ftbundle_dir, ':p') . '*')
+    for ftdetect in glob(dir . '/*/ftdetect/*.vim', 1, 1)
+      if g:paving#hardcode
+        call add(lines, '" ' . ftdetect)
+        call extend(lines, filter(readfile(ftdetect), 'v:val !~# "^$" && v:val !~# "^\s*\""'))
+      else
+        call add(lines, 'source ' . ftdetect)
+      endif
+    endfor
+    let dirs = s:glob_bundles(dir)
     for ft in split(fnamemodify(dir, ':t'), ',')
-      let bundles = s:glob_bundles(dir)
-      for bundle in bundles
-        for ftdetect in glob(bundle . '/ftdetect/*.vim', 1, 1)
-          if g:paving#hardcode
-            call add(lines, '" ' . ftdetect)
-            call extend(lines, filter(readfile(ftdetect), 'v:val !~# "^$" && v:val !~# "^\s*\""'))
-          else
-            call add(lines, 'source ' . ftdetect)
-          endif
-        endfor
-      endfor
-      let _[ft] = get(_, ft, []) + bundles
+      let _[ft] = get(_, ft, []) + dirs
     endfor
   endfor
 
@@ -295,4 +293,4 @@ if expand("%:p") != expand("<sfile>:p")
 endif
 
 
-call paving#store(g:env#rc_dir . '/vimrc.paved', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
+call paving#store('~/.vimrc.paved', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
