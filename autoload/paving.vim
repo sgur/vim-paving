@@ -118,7 +118,7 @@ endfunction
 
 function! s:glob_bundles(base_dir)
   if type(a:base_dir) == type([])
-    let base_dir = join(map(a:base_dir, 'fnamemodify(v:val, ":p")'), ',')
+    let base_dir = join(map(a:base_dir, 'fnamemodify(v:val, ":p:h")'), ',')
     let dirs = s:globpath(base_dir, '*')
   else
     let base_dir = fnamemodify(a:base_dir, ':p')
