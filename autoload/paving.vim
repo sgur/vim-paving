@@ -3,7 +3,8 @@ set cpo&vim
 
 
 
-let g:paving#hardcode = get(g:, 'paving#hardcode', 0)
+let g:paving#hardcode = 0
+let g:paving#filetype_separator = ';'
 
 
 
@@ -169,7 +170,7 @@ function! s:ft_generate(ftbundle_dir)
       endif
     endfor
     let dirs = s:glob_bundles(dir)
-    for ft in split(fnamemodify(dir, ':t'), ',')
+    for ft in split(fnamemodify(dir, ':t'), g:paving#filetype_separator)
       let _[ft] = get(_, ft, []) + dirs
     endfor
   endfor
