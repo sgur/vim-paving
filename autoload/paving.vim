@@ -110,7 +110,7 @@ function! s:globpath(path, expr)
   try
     return has('patch-7.4.279')
           \ ? globpath(a:path, a:expr, 0, 1)
-          \ : split(globpath(a:path, expr, 1))
+          \ : split(globpath(a:path, a:expr, 1))
   finally
     let &wildignore = wig
   endtry
