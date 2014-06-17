@@ -235,7 +235,7 @@ function! s:deploy_on_source()
   for l in range(0, len(buf)-1)
     let buf[l] = substitute(buf[l]
           \ , 's:GLOBPATH(\([^)]\+\))'
-          \ , !has('patch-7.4.279')
+          \ , has('patch-7.4.279')
           \   ? 'globpath(\1, 1, 1)'
           \   : 'split(globpath(\1, 1))'
           \ ,'g')
