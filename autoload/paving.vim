@@ -259,7 +259,7 @@ endfunction
 " BEGIN_LOADED
 let g:paving#enabled = 1
 
-function! PavingLoaded(plugin)
+function! Paved(plugin)
   return has_key(s:loaded, a:plugin)
 endfunction
 " END_LOADED
