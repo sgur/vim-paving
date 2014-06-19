@@ -15,7 +15,9 @@ if !exists('g:paving#enabled')
   let &runtimepath .= ',' . expand('<sfile>:~:h:h')
 endif
 
-command! -nargs=* PavingGenerate  call paving#cmd_generate(<f-args>)
+
+command! -nargs=* Pave  call paving#cmd_generate(<f-args>)
+
 
 
 if !exists(':Helptags')
