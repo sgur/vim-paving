@@ -40,6 +40,21 @@ function! paving#cmd_generate(...)
 endfunction
 
 
+function! paving#helptags(...)
+  if !a:0
+    let dirs = filter(map(split(&runtimepath, ','), 'expand(v:val . "/doc")'), 'isdirectory(v:val)')
+  else
+    let dirs = map(copy(a:000), 'expand(v:val)')
+  endif
+
+  echohl Title | echo 'helptags' | echohl NONE
+  for d in dirs
+    echon ' ' . fnamemodify(d, ':h:t')
+    execute 'helptags' d
+  endfor
+endfunction
+
+
 let s:loaded = {}
 let s:bufname = expand('<sfile>')
 

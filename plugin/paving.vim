@@ -18,6 +18,11 @@ endif
 command! -nargs=* PavingGenerate  call paving#cmd_generate(<f-args>)
 
 
+if !exists(':Helptags')
+  command! -nargs=* -complete=dir Helptags  call paving#helptags(<f-args>)
+endif
+
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
