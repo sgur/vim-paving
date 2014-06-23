@@ -192,9 +192,9 @@ function! s:ft_generate(ftbundle_dir)
 
   call add(lines, 'augroup ftbundle')
   for ft in keys(_)
-    call add(lines,
-          \   printf('  autocmd FileType %s  call s:on_source(%s)'
-          \   , ft, string(_[ft])))
+    call add(lines
+          \ , printf('  autocmd FileType %s  call s:on_filetype(%s, "%s")'
+          \   , ft, string(_[ft]), ft))
   endfor
   call add(lines, 'augroup END')
   return lines
@@ -280,7 +280,7 @@ endfunction
 " END_LOADED
 
 " BEGIN_ON_SOURCE
-function! s:on_source(bundle_dirs)
+function! s:on_filetype(bundle_dirs, filetype)
   for dir in a:bundle_dirs
     let key = fnamemodify(dir, ':t')
     if !has_key(s:loaded, key)
@@ -296,6 +296,19 @@ function! s:on_source(bundle_dirs)
     for plugin in filter(s:GLOBPATH(dir, 'plugin/**/*.vim'), '!isdirectory(v:val)')
       execute 'source' fnameescape(plugin)
     endfor
+  endfor
+  execute 'autocmd! ftbundle FileType' a:filetype
+  call s:do_filetype_autocmd(a:filetype)
+endfunction
+
+function! s:do_filetype_autocmd(filetype)
+  redir => raw_autocmds
+  silent! execute 'autocmd FileType' a:filetype
+  redir END
+  let autocmds = split(raw_autocmds, "\\r\\n\\|\\r\\|\\n")
+  let cmds = map(autocmds, 'matchstr(v:val, "\\s\\{4}\\i*\\s\\{6}\\zs\\(.\\+\\)$")')
+  for cmd in cmds
+    execute cmd
   endfor
 endfunction
 " END_ON_SOURCE
