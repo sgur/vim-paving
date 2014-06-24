@@ -283,16 +283,15 @@ endfunction
 " BEGIN_ON_SOURCE
 function! s:on_filetype(bundle_dirs, filetype)
   for dir in a:bundle_dirs
-    let key = fnamemodify(dir, ':t')
-    if !has_key(s:loaded, key)
-      let rtps = split(&runtimepath, ',')
-      let bundled = insert(rtps, dir, 1)
+    let plugin_name = fnamemodify(dir, ':t')
+    if !has_key(s:loaded, plugin_name)
+      let bundled = insert(split(&runtimepath, ','), dir, 1)
       let after_dir = expand(dir . '/after')
       if isdirectory(after_dir)
-        let bundled = insert(rtps, after_dir, -1)
+        let bundled = insert(bundled, after_dir, -1)
       endif
       let &runtimepath = join(bundled, ',')
-      let s:loaded[key] = 1
+      let s:loaded[plugin_name] = 1
     endif
     for plugin in filter(s:GLOBPATH(dir, 'plugin/**/*.vim'), '!isdirectory(v:val)')
       execute 'source' fnameescape(plugin)
