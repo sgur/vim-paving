@@ -3,8 +3,9 @@ set cpo&vim
 
 
 
-let g:paving#hardcode = 0
-let g:paving#filetype_separator = '.'
+let g:paving#hardcode = get(g:, 'paving#hardcode', 0)
+let g:paving#filetype_separator = get(g:, 'paving#filetype_separator', '.')
+let g:paving#blacklist = get(g:, 'paving#blacklist', [])
 
 
 
