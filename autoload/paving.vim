@@ -98,7 +98,7 @@ endfunction
 
 function! s:default_params()
   return {
-        \   'vimrc' : '~/.vimrc.paved'
+        \   'vimrc' : $MYVIMRC . '.paved'
         \ , 'bundle' : [s:default_vimdir() . '/bundle']
         \ }
 endfunction
