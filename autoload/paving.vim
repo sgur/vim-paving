@@ -16,14 +16,16 @@ function! paving#store(filename, bundle_dir, ...)
   let loaded = s:register(bundles)
   let [bundles, nobundles] = s:prune_bundles(bundles)
   call add(lines, 'set runtimepath =' . s:rtp_generate(bundles))
-  call add(lines, 'let s:loaded = ' . string(loaded))
   call extend(lines, s:source_functions(nobundles))
   call extend(lines, s:deploy_loaded())
   " ftbundle directory
   if a:0 > 0
-    call extend(lines, s:ft_generate(expand(a:1)))
+    let [ft_lines, ft_loaded] = s:ft_generate(expand(a:1))
+    call extend(lines, ft_lines)
+    call extend(loaded, ft_loaded)
     call extend(lines, s:deploy_on_source())
   endif
+  call add(lines, 'let s:loaded = ' . string(loaded))
   call writefile(lines, expand(a:filename))
   return loaded
 endfunction
@@ -176,6 +178,7 @@ endfunction
 function! s:ft_generate(ftbundle_dir)
   let _ = {}
   let lines = []
+  let loaded = {}
   for dir in s:glob(fnamemodify(a:ftbundle_dir, ':p') . '*')
     for ftdetect in glob(dir . '/*/ftdetect/*.vim', 1, 1)
       if g:paving#hardcode
@@ -186,6 +189,7 @@ function! s:ft_generate(ftbundle_dir)
       endif
     endfor
     let dirs = s:glob_bundles(dir)
+    call extend(loaded, s:register(dirs))
     for ft in split(fnamemodify(dir, ':t'), '\V' . g:paving#filetype_separator)
       let _[ft] = get(_, ft, []) + dirs
     endfor
@@ -198,7 +202,7 @@ function! s:ft_generate(ftbundle_dir)
           \   , ft, string(_[ft]), ft))
   endfor
   call add(lines, 'augroup END')
-  return lines
+  return [lines, loaded]
 endfunction
 
 
