@@ -13,7 +13,7 @@ function! paving#store(filename, bundle_dir, ...)
   let lines = []
   " bundle directory
   let bundles = s:glob_bundles(a:bundle_dir)
-  let loaded = s:register(bundles)
+  let loaded = s:register(bundles, 1)
   let [bundles, nobundles] = s:prune_bundles(bundles)
   call add(lines, 'set runtimepath =' . s:rtp_generate(bundles))
   call extend(lines, s:source_functions(nobundles))
@@ -152,10 +152,10 @@ function! s:glob_after(rtp)
 endfunction
 
 
-function! s:register(bundles)
+function! s:register(bundles, value)
   let _ = {}
   for bundle in a:bundles
-    let _[fnamemodify(bundle, ':t')] = 1
+    let _[fnamemodify(bundle, ':t')] = a:value
   endfor
   return _
 endfunction
@@ -189,7 +189,7 @@ function! s:ft_generate(ftbundle_dir)
       endif
     endfor
     let dirs = s:glob_bundles(dir)
-    call extend(loaded, s:register(dirs))
+    call extend(loaded, s:register(dirs, 0))
     for ft in split(fnamemodify(dir, ':t'), '\V' . g:paving#filetype_separator)
       let _[ft] = get(_, ft, []) + dirs
     endfor
@@ -288,7 +288,7 @@ endfunction
 function! s:on_filetype(bundle_dirs, filetype)
   for dir in a:bundle_dirs
     let plugin_name = fnamemodify(dir, ':t')
-    if !has_key(s:loaded, plugin_name)
+    if has_key(s:loaded, plugin_name) && !s:loaded[plugin_name]
       let bundled = insert(split(&runtimepath, ','), dir, 1)
       let after_dir = expand(dir . '/after')
       if isdirectory(after_dir)
