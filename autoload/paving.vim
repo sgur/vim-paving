@@ -198,8 +198,8 @@ function! s:ft_generate(ftbundle_dir)
   call add(lines, 'augroup ftbundle')
   for ft in keys(_)
     call add(lines
-          \ , printf('  autocmd FileType %s  call s:on_filetype(%s, "%s")'
-          \   , ft, string(_[ft]), ft))
+          \ , printf('  autocmd FileType %s  call s:on_filetype(%s)'
+          \   , ft, string(_[ft])))
   endfor
   call add(lines, 'augroup END')
   return [lines, loaded]
@@ -285,7 +285,7 @@ endfunction
 " END_LOADED
 
 " BEGIN_ON_SOURCE
-function! s:on_filetype(bundle_dirs, filetype)
+function! s:on_filetype(bundle_dirs)
   for dir in a:bundle_dirs
     let plugin_name = fnamemodify(dir, ':t')
     if has_key(s:loaded, plugin_name) && !s:loaded[plugin_name]
@@ -301,8 +301,8 @@ function! s:on_filetype(bundle_dirs, filetype)
       execute 'source' fnameescape(plugin)
     endfor
   endfor
-  execute 'autocmd! ftbundle FileType' a:filetype
-  call s:do_filetype_autocmd(a:filetype)
+  execute 'autocmd! ftbundle FileType' &filetype
+  call s:do_filetype_autocmd(&filetype)
 endfunction
 
 function! s:do_filetype_autocmd(filetype)
