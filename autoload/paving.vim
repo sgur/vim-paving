@@ -9,35 +9,13 @@ let g:paving#blacklist = get(g:, 'paving#blacklist', [])
 
 
 
-function! paving#store(filename, bundle_dir, ...)
-  let lines = []
-  " bundle directory
-  let bundles = s:glob_bundles(a:bundle_dir)
-  let loaded = s:register(bundles, 1)
-  let [bundles, nobundles] = s:prune_bundles(bundles)
-  call add(lines, 'set runtimepath =' . s:rtp_generate(bundles))
-  call extend(lines, s:source_functions(nobundles))
-  call extend(lines, s:deploy_loaded())
-  " ftbundle directory
-  if a:0 > 0
-    let [ft_lines, ft_loaded] = s:ft_generate(expand(a:1))
-    call extend(lines, ft_lines)
-    call extend(loaded, ft_loaded)
-    call extend(lines, s:deploy_on_source())
-  endif
-  call add(lines, 'let s:loaded = ' . string(loaded))
-  call writefile(lines, expand(a:filename))
-  return loaded
-endfunction
-
-
 function! paving#cmd_generate(...)
   let config = copy(get(g:, 'paving#config', s:default_params()))
   call extend(config , s:parse_params(a:000), 'force')
 
   let loaded = has_key(config, 'ftbundle')
-        \ ? paving#store(config.vimrc, config.bundle, config.ftbundle)
-        \ : paving#store(config.vimrc, config.bundle)
+        \ ? s:store(config.vimrc, config.bundle, config.ftbundle)
+        \ : s:store(config.vimrc, config.bundle)
 
   call s:stats(config, loaded)
 endfunction
@@ -58,8 +36,27 @@ function! paving#helptags(...)
 endfunction
 
 
-let s:loaded = {}
-let s:bufname = expand('<sfile>')
+
+function! s:store(filename, bundle_dir, ...)
+  let lines = []
+  " bundle directory
+  let bundles = s:glob_bundles(a:bundle_dir)
+  let loaded = s:register(bundles, 1)
+  let [bundles, nobundles] = s:prune_bundles(bundles)
+  call add(lines, 'set runtimepath =' . s:rtp_generate(bundles))
+  call extend(lines, s:source_functions(nobundles))
+  call extend(lines, s:deploy_loaded())
+  " ftbundle directory
+  if a:0 > 0
+    let [ft_lines, ft_loaded] = s:ft_generate(expand(a:1))
+    call extend(lines, ft_lines)
+    call extend(loaded, ft_loaded)
+    call extend(lines, s:deploy_on_source())
+  endif
+  call add(lines, 'let s:loaded = ' . string(loaded))
+  call writefile(lines, expand(a:filename))
+  return loaded
+endfunction
 
 
 function! s:stats(config, loaded_plugins)
@@ -319,11 +316,13 @@ endfunction
 
 
 
-if expand("%:p") != expand("<sfile>:p")
-  let &cpo = s:save_cpo
-  unlet s:save_cpo
+let s:loaded = {}
+let s:bufname = expand('<sfile>')
+
+
+
+if expand("%:p") == expand("<sfile>:p")
   finish
 endif
-
-
-call paving#store('~/.vimrc.paved', map(['bundle', 'local'], 'g:env#rc_dir . "/" . v:val') , g:env#rc_dir . '/ftbundle')
+let &cpo = s:save_cpo
+unlet s:save_cpo
