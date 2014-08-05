@@ -9,7 +9,7 @@ let g:paving#blacklist = get(g:, 'paving#blacklist', [])
 
 
 
-function! paving#cmd_generate(...)
+function! paving#cmd_generate(bang, ...)
   let config = copy(get(g:, 'paving#config', s:default_params()))
   call extend(config , s:parse_params(a:000), 'force')
 
@@ -18,6 +18,10 @@ function! paving#cmd_generate(...)
         \ : s:store(config.vimrc, config.bundle)
 
   call s:stats(config, loaded)
+
+  if a:bang
+    call s:apply(config.vimrc)
+  endif
 endfunction
 
 
@@ -56,6 +60,19 @@ function! s:store(filename, bundle_dir, ...)
   call add(lines, 'let s:loaded = ' . string(loaded))
   call writefile(lines, expand(a:filename))
   return loaded
+endfunction
+
+
+function! s:apply(vimrc)
+  execute 'source' a:vimrc
+  for rtp in split(&runtimepath, ',')
+    for ftdetect in globpath(rtp, 'ftdetect/*.vim', 1, 1)
+      execute 'source' ftdetect
+    endfor
+    for plugin in globpath(rtp, 'plugin/*.vim', 1, 1)
+      execute 'source' plugin
+    endfor
+  endfor
 endfunction
 
 

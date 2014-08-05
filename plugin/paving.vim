@@ -16,7 +16,7 @@ if !exists('g:paving#enabled')
 endif
 
 
-command! -nargs=* Pave  call paving#cmd_generate(<f-args>)
+command! -nargs=* -bang Pave  call paving#cmd_generate(<bang>0, <f-args>)
 
 
 
