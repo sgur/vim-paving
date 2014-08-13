@@ -10,12 +10,16 @@ let g:paving#blacklist = get(g:, 'paving#blacklist', [])
 
 
 function! paving#cmd_generate(bang, ...)
-  let config = copy(get(g:, 'paving#config', s:default_params()))
+  let config = deepcopy(get(g:, 'paving#config', s:default_params()))
   call extend(config , s:parse_params(a:000), 'force')
 
-  let loaded = has_key(config, 'ftbundle')
-        \ ? s:store(config.vimrc, config.bundle, config.ftbundle)
-        \ : s:store(config.vimrc, config.bundle)
+  call filter(config.bundle, 'isdirectory(v:val)')
+  if has_key(config, 'ftbundle')
+    let loaded = s:store(config.vimrc, config.bundle, config.ftbundle)
+  else
+    call filter(config.ftbundle, 'isdirectory(v:val)')
+    let loaded = s:store(config.vimrc, config.bundle)
+  endif
 
   call s:stats(config, loaded)
 
