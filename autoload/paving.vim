@@ -37,7 +37,7 @@ function! paving#helptags(...)
   endif
 
   echohl Title | echo 'helptags' | echohl NONE
-  for d in dirs
+  for d in filter(dirs, 'filewritable(v:val) == 2')
     echon ' ' . fnamemodify(d, ':h:t')
     execute 'helptags' d
   endfor
