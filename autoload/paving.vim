@@ -126,7 +126,7 @@ endfunction
 
 function! s:prepare_blacklist()
   let oldval = &wildignore
-  let newval = '*~,' . join(map(copy(get(g:, 'paving#blacklist', [])), '"*" . v:val . "*"'), ',')
+  let newval = '*~,' . join(map(copy(g:paving#blacklist), '"*" . v:val . "*"'), ',')
   return [oldval, newval]
 endfunction
 
