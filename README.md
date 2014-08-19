@@ -17,9 +17,9 @@ Yet Another なプラグインローダーの技術検証です。
 
 ### コマンド
 
-~~~vim
+```vim
 :Pave [-bundle[=~/.vim/bundle]] [-ftbundle[=~/.vim/ftbundle]] [~/.vimrc.paved]
-~~~
+```
 
 デフォルト設定もしくは `g:paving#config` の設定をもとにプラグインローダーを生成します。
 `:
@@ -27,14 +27,13 @@ Yet Another なプラグインローダーの技術検証です。
 
 - -bundle
 - -ftbundle
-
-~~~vim
+```vim
 :Pave -bundle -ftbundle ~/.vimrc.loader
-~~~
+```
 
-~~~vim
+```vim
 :Pave -bundle=~/.vim/bundler,~/.vim/local -ftbundle=~/.vim/filetype ~/.vimrc.loader
-~~~
+```
 
 Requirements
 ------------
