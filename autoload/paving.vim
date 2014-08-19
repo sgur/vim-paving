@@ -14,11 +14,9 @@ function! paving#cmd_generate(bang, ...)
   call extend(config , s:parse_params(a:000), 'force')
 
   call filter(config.bundle, 'isdirectory(v:val)')
-  if has_key(config, 'ftbundle')
-    let loaded = s:store(config.vimrc, config.bundle, config.ftbundle)
-  else
-    let loaded = s:store(config.vimrc, config.bundle)
-  endif
+  let loaded = has_key(config, 'ftbundle')
+        \ ? s:store(config.vimrc, config.bundle, config.ftbundle)
+        \ : s:store(config.vimrc, config.bundle)
 
   call s:stats(config, loaded)
 
