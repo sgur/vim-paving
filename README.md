@@ -27,6 +27,7 @@ Yet Another なプラグインローダーの技術検証です。
 
 - -bundle
 - -ftbundle
+
 ```vim
 :Pave -bundle -ftbundle ~/.vimrc.loader
 ```
