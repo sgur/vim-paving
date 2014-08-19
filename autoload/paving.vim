@@ -17,7 +17,6 @@ function! paving#cmd_generate(bang, ...)
   if has_key(config, 'ftbundle')
     let loaded = s:store(config.vimrc, config.bundle, config.ftbundle)
   else
-    call filter(config.ftbundle, 'isdirectory(v:val)')
     let loaded = s:store(config.vimrc, config.bundle)
   endif
 
