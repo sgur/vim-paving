@@ -211,9 +211,10 @@ function! s:ft_generate(ftbundle_dir)
   endfor
 
   call add(lines, 'augroup ftbundle')
+  call add(lines, '  autocmd!')
   for ft in keys(_)
     call add(lines
-          \ , printf('  autocmd FileType %s  call s:on_filetype(%s)'
+          \ , printf('  autocmd FileType *%s*  call s:on_filetype(%s)'
           \   , ft, string(_[ft])))
   endfor
   call add(lines, 'augroup END')
